@@ -326,6 +326,9 @@ func (k Keeper) queryToStore(ctx sdk.Context, contractAddress sdk.AccAddress, ke
 }
 
 func (k Keeper) queryToContract(ctx sdk.Context, contractAddr sdk.AccAddress, queryMsg []byte) ([]byte, error) {
+	k.mtx.Lock()
+	defer k.mtx.Unlock()
+
 	ctx.GasMeter().ConsumeGas(types.InstanceCost, "Loading CosmWasm module: query")
 
 	codeInfo, contractStorePrefix, err := k.getContractDetails(ctx, contractAddr)

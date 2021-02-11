@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"path/filepath"
+	"sync"
 
 	wasm "github.com/CosmWasm/go-cosmwasm"
 	"github.com/spf13/viper"
@@ -41,6 +42,7 @@ type Keeper struct {
 	// WASM config values
 	wasmConfig       *config.Config
 	loggingWhitelist map[string]bool
+	mtx              *sync.Mutex
 }
 
 // NewKeeper creates a new contract Keeper instance
@@ -75,6 +77,7 @@ func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey,
 		loggingWhitelist: wasmConfig.WhitelistToMap(),
 		msgParser:        types.NewModuleMsgParser(),
 		querier:          types.NewModuleQuerier(),
+		mtx:              new(sync.Mutex),
 	}
 }
 
