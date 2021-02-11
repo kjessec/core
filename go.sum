@@ -448,15 +448,14 @@ github.com/tendermint/go-amino v0.15.1 h1:D2uk35eT4iTsvJd9jWIetzthE5C0/k2QmMFkCN
 github.com/tendermint/go-amino v0.15.1/go.mod h1:TQU0M1i/ImAo+tYpZi73AU3V/dKeCoMC9Sphe2ZwGME=
 github.com/tendermint/iavl v0.14.1 h1:jz7YOvGiPwmcqqVMcSMjxCu4WXtQYGhKdKrWTTJ5EKs=
 github.com/tendermint/iavl v0.14.1/go.mod h1:QmfViflFiXzxKLQE4tAUuWQHq+RSuQFxablW5oJZ6sE=
-github.com/tendermint/tendermint v0.33.5/go.mod h1:0yUs9eIuuDq07nQql9BmI30FtYGcEC60Tu5JzB5IezM=
-github.com/tendermint/tendermint v0.33.9 h1:rRKIfu5qAXX5f9bwX1oUXSZz/ALFJjDuivhkbGUQxiU=
-github.com/tendermint/tendermint v0.33.9/go.mod h1:0yUs9eIuuDq07nQql9BmI30FtYGcEC60Tu5JzB5IezM=
 github.com/tendermint/tm-db v0.5.1 h1:H9HDq8UEA7Eeg13kdYckkgwwkQLBnJGgX4PgLJRhieY=
 github.com/tendermint/tm-db v0.5.1/go.mod h1:g92zWjHpCYlEvQXvy9M168Su8V1IBEeawpXVVBaK4f4=
 github.com/terra-project/go-cosmwasm v0.10.4 h1:2UmueP0/LngjTYmFr7K3sJRA2cvtROxaPOC+i5ZM0oA=
 github.com/terra-project/go-cosmwasm v0.10.4/go.mod h1:gAFCwllx97ejI+m9SqJQrmd2SBW7HA0fOjvWWJjM2uc=
 github.com/terra-project/ledger-terra-go v0.11.1-terra h1:BnwRp8dyJMN5sROg8g6dXc5/Zoi44gd5c8Llf0Nobac=
 github.com/terra-project/ledger-terra-go v0.11.1-terra/go.mod h1:5fdyEuDNvsymbqag/EaaAeWAgyAebQe2VH38H+DnXnA=
+github.com/terra-project/tendermint v0.33.10-0.20210204080930-764c9def344a h1:UFg6L3YspcW5EnejRHsUmaDQWeCbLqgC6Dqbahjk/7s=
+github.com/terra-project/tendermint v0.33.10-0.20210204080930-764c9def344a/go.mod h1:0yUs9eIuuDq07nQql9BmI30FtYGcEC60Tu5JzB5IezM=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/ugorji/go v1.1.4/go.mod h1:uQMGLiO92mf5W77hV/PUCpI3pbzQx3CRekS0kk+RGrc=
