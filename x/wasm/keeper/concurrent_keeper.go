@@ -78,6 +78,11 @@ func NewConcurrentWasmVMContext(
 
 // Next
 func (c *ConcurrentWasmVMContext) AssignNext(ctx sdk.Context) sdk.Context {
+	// do NOT assign query vm in case of execution
+	if ctx.Value(contextKeyExecutionType).(ExecutionType) == ExecutionTypeExecution {
+		return ctx
+	}
+
 	_, ok := ctx.Context().Value(contextKeyAllocatedVMIndex).(int)
 
 	// if vm index is never assigned upon arriving this method,
