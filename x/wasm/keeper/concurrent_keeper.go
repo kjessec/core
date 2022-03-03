@@ -103,8 +103,10 @@ func (c *ConcurrentWasmVMContext) Get(idx uint64) types.WasmerEngine {
 
 func setExecutionType(ctx sdk.Context, executionType ExecutionType) sdk.Context {
 	// do NOT reassign ExecutionType
-	preassigned := ctx.Context().Value(contextKeyExecutionType)
-	fmt.Println("-----  setting execution type", executionType, preassigned)
+	if preassigned := ctx.Context().Value(contextKeyExecutionType); preassigned != nil {
+		return ctx
+	}
+	fmt.Println("-----  setting execution type", executionType)
 	return ctx.WithContext(context.WithValue(ctx.Context(), contextKeyExecutionType, executionType))
 }
 
