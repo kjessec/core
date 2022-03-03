@@ -115,28 +115,6 @@ func getExecutionType(ctx sdk.Context) ExecutionType {
 }
 
 // extend keeper
-
-// NewConcurrentKeeper creates a pool of wasmVM's
-func (k Keeper) NewConcurrentKeeper(
-	supportedFeatures string,
-	homePath string,
-	concurrencyFactor int,
-) error {
-	concurrentWasmVMContext, err := NewConcurrentWasmVMContext(
-		supportedFeatures,
-		homePath,
-		k.wasmConfig,
-		concurrencyFactor,
-	)
-
-	if err != nil {
-		return err
-	}
-
-	k.concurrentWasmVMContext = concurrentWasmVMContext
-	return nil
-}
-
 func (k Keeper) getWasmVM(ctx sdk.Context) types.WasmerEngine {
 	if k.concurrentWasmVMContext == nil {
 		return k.wasmVM

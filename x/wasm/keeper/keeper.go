@@ -86,6 +86,16 @@ func NewKeeper(
 		panic(err)
 	}
 
+	concurrentWasmVMContext, err := NewConcurrentWasmVMContext(
+		supportedFeatures,
+		homePath,
+		wasmConfig,
+		16,
+	)
+	if err != nil {
+		panic(err)
+	}
+
 	return Keeper{
 		storeKey:       storeKey,
 		cdc:            cdc,
@@ -101,7 +111,7 @@ func NewKeeper(
 		querier:        types.NewWasmQuerier(),
 
 		// nil by default for safety
-		concurrentWasmVMContext: nil,
+		concurrentWasmVMContext: concurrentWasmVMContext,
 	}
 }
 
