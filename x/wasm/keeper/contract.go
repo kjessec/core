@@ -30,7 +30,7 @@ func (k Keeper) CompileCode(ctx sdk.Context, wasmCode []byte) (codeHash []byte, 
 
 	ctx.GasMeter().ConsumeGas(types.CompileCosts(len(wasmCode)), "Compiling WASM Bytes Cost")
 
-	codeHash, err = k.wasmVM.Create(wasmCode)
+	codeHash, err = k.getWasmVM(ctx).Create(wasmCode)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrStoreCodeFailed, err.Error())
 	}
@@ -147,7 +147,7 @@ func (k Keeper) InstantiateContract(
 	contractStore := prefix.NewStore(types.KVStore(ctx, k.storeKey), contractStoreKey)
 
 	// instantiate wasm contract
-	res, gasUsed, err := k.wasmVM.Instantiate(
+	res, gasUsed, err := k.getWasmVM(ctx).Instantiate(
 		codeInfo.CodeHash,
 		env,
 		info,
@@ -204,6 +204,7 @@ func (k Keeper) ExecuteContract(
 	coins sdk.Coins) ([]byte, error) {
 	defer telemetry.MeasureSince(time.Now(), "wasm", "contract", "execute")
 	ctx.GasMeter().ConsumeGas(types.InstantiateContractCosts(len(execMsg)), "Loading CosmWasm module: execute")
+	ctx = setExecutionType(ctx, ExecutionTypeExecution)
 
 	if uint64(len(execMsg)) > k.MaxContractMsgSize(ctx) {
 		return nil, sdkerrors.Wrap(types.ErrExceedMaxContractMsgSize, "execute msg size is too huge")
@@ -224,7 +225,7 @@ func (k Keeper) ExecuteContract(
 
 	env := types.NewEnv(ctx, contractAddress)
 	info := types.NewInfo(sender, coins)
-	res, gasUsed, err := k.wasmVM.Execute(
+	res, gasUsed, err := k.getWasmVM(ctx).Execute(
 		codeInfo.CodeHash,
 		env,
 		info,
@@ -275,6 +276,8 @@ func (k Keeper) MigrateContract(
 	migrateMsg []byte) ([]byte, error) {
 	defer telemetry.MeasureSince(time.Now(), "wasm", "contract", "migrate")
 	ctx.GasMeter().ConsumeGas(types.InstantiateContractCosts(len(migrateMsg)), "Loading CosmWasm module: migrate")
+	// set query specific ctxs
+	ctx = setExecutionType(ctx, ExecutionTypeExecution)
 
 	if uint64(len(migrateMsg)) > k.MaxContractMsgSize(ctx) {
 		return nil, sdkerrors.Wrap(types.ErrExceedMaxContractMsgSize, "migrate msg size is too huge")
@@ -304,7 +307,7 @@ func (k Keeper) MigrateContract(
 	prefixStoreKey := types.GetContractStoreKey(contractAddress)
 	prefixStore := prefix.NewStore(types.KVStore(ctx, k.storeKey), prefixStoreKey)
 
-	res, gasUsed, err := k.wasmVM.Migrate(
+	res, gasUsed, err := k.getWasmVM(ctx).Migrate(
 		newCodeInfo.CodeHash,
 		env,
 		migrateMsg,
@@ -363,7 +366,7 @@ func (k Keeper) reply(
 	}
 
 	env := types.NewEnv(ctx, contractAddress)
-	res, gasUsed, err := k.wasmVM.Reply(
+	res, gasUsed, err := k.getWasmVM(ctx).Reply(
 		codeInfo.CodeHash,
 		env,
 		reply,
@@ -420,6 +423,10 @@ func (k Keeper) queryToContract(ctx sdk.Context, contractAddress sdk.AccAddress,
 	defer telemetry.MeasureSince(time.Now(), "wasm", "contract", "query-smart")
 	ctx.GasMeter().ConsumeGas(types.InstantiateContractCosts(len(queryMsg)), "Loading CosmWasm module: query")
 
+	// set query specific ctxs
+	ctx = setExecutionType(ctx, ExecutionTypeQuery)
+	ctx = k.concurrentWasmVMContext.AssignNext(ctx)
+
 	codeInfo, contractStorePrefix, err := k.getContractDetails(ctx, contractAddress)
 	if err != nil {
 		return nil, err
@@ -433,7 +440,7 @@ func (k Keeper) queryToContract(ctx sdk.Context, contractAddress sdk.AccAddress,
 		return nil, err
 	}
 
-	queryResult, gasUsed, err := k.wasmVM.Query(
+	queryResult, gasUsed, err := k.getWasmVM(ctx).Query(
 		codeInfo.CodeHash,
 		env,
 		queryMsg,

@@ -39,6 +39,9 @@ type Keeper struct {
 
 	// WASM config values
 	wasmConfig *config.Config
+
+	// concurrent wasm vms for queries
+	concurrentWasmVMContext *ConcurrentWasmVMContext
 }
 
 // NewKeeper creates a new contract Keeper instance
@@ -90,6 +93,9 @@ func NewKeeper(
 		wasmConfig:     wasmConfig,
 		msgParser:      types.NewWasmMsgParser(),
 		querier:        types.NewWasmQuerier(),
+
+		// nil by default for safety
+		concurrentWasmVMContext: nil,
 	}
 }
 
@@ -207,7 +213,7 @@ func (k Keeper) GetByteCode(ctx sdk.Context, codeID uint64) ([]byte, error) {
 		return nil, sdkErr
 	}
 
-	byteCode, err := k.wasmVM.GetCode(codeInfo.CodeHash)
+	byteCode, err := k.getWasmVM(ctx).GetCode(codeInfo.CodeHash)
 	if err != nil {
 		return nil, err
 	}

@@ -409,6 +409,14 @@ func NewTerraApp(
 		homePath, wasmConfig,
 	)
 
+	if concurrentWasmErr := app.WasmKeeper.NewConcurrentKeeper(
+		wasmtypes.DefaultFeatures,
+		homePath,
+		16,
+	); concurrentWasmErr != nil {
+		panic(concurrentWasmErr)
+	}
+
 	// register wasm msg parser & querier
 	app.WasmKeeper.RegisterMsgParsers(map[string]wasmtypes.WasmMsgParserInterface{
 		wasmtypes.WasmMsgParserRouteBank:         bankwasm.NewWasmMsgParser(),
