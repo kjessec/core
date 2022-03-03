@@ -67,6 +67,11 @@ func NewConcurrentWasmVMContext(
 	}
 
 	return &ConcurrentWasmVMContext{
+		i: 0,
+		config: ConcurrentWasmVMConfig{
+			NumParallelism:  uint(concurrencyFactor),
+			NumWorkersPerVM: 0,
+		},
 		concurrentWasmVMs: wasmVMs,
 	}, nil
 }
