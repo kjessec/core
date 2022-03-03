@@ -83,12 +83,7 @@ func (c *ConcurrentWasmVMContext) AssignNext(ctx sdk.Context) sdk.Context {
 		return ctx
 	}
 
-	_, ok := ctx.Context().Value(contextKeyAllocatedVMIndex).(int)
-
-	// if vm index is never assigned upon arriving this method,
-	// this context is coming from an unusual route
-	// try & force allocate
-	if ok {
+	if exists := ctx.Context().Value(contextKeyAllocatedVMIndex); exists != nil {
 		return ctx
 	}
 
