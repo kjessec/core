@@ -56,6 +56,7 @@ func NewConcurrentWasmVMContext(
 			types.ContractMemoryLimit,
 			wasmConfig.ContractDebugMode,
 			wasmConfig.ContractMemoryCacheSize,
+			wasmConfig.RefreshThreadNum,
 		)
 
 		if err != nil {
