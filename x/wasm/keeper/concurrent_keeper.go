@@ -2,10 +2,12 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 	wasmvm "github.com/CosmWasm/wasmvm"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/terra-money/core/x/wasm/config"
 	"github.com/terra-money/core/x/wasm/types"
+	"math/big"
 	"path/filepath"
 )
 
@@ -75,7 +77,7 @@ func NewConcurrentWasmVMContext(
 }
 
 // Next
-func (c *ConcurrentWasmVMContext) AssignNext(ctx sdk.Context, codeID uint64) sdk.Context {
+func (c *ConcurrentWasmVMContext) AssignNext(ctx sdk.Context, codeHash []byte) sdk.Context {
 	// do NOT assign query vm in case of execution
 	if ctx.Value(contextKeyExecutionType).(ExecutionType) == ExecutionTypeExecution {
 		return ctx
@@ -85,9 +87,12 @@ func (c *ConcurrentWasmVMContext) AssignNext(ctx sdk.Context, codeID uint64) sdk
 		return ctx
 	}
 
-	assigned := codeID % uint64(c.config.NumParallelism)
+	i := &big.Int{}
+	i.FillBytes(codeHash)
+	z := big.NewInt(0).Mod(i, big.NewInt(int64(c.config.NumParallelism)))
+	fmt.Println("assigned", z.Uint64())
 
-	return ctx.WithContext(context.WithValue(ctx.Context(), contextKeyAllocatedVMIndex, assigned))
+	return ctx.WithContext(context.WithValue(ctx.Context(), contextKeyAllocatedVMIndex, z.Uint64()))
 }
 
 func (c *ConcurrentWasmVMContext) Get(idx uint64) types.WasmerEngine {

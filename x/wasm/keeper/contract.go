@@ -427,15 +427,14 @@ func (k Keeper) queryToContract(ctx sdk.Context, contractAddress sdk.AccAddress,
 	defer telemetry.MeasureSince(time.Now(), "wasm", "contract", "query-smart")
 	ctx.GasMeter().ConsumeGas(types.InstantiateContractCosts(len(queryMsg)), "Loading CosmWasm module: query")
 
-	// set query specific ctxs
-	ctx = setExecutionType(ctx, ExecutionTypeQuery)
-
 	codeInfo, contractStorePrefix, err := k.getContractDetails(ctx, contractAddress)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx = k.concurrentWasmVMContext.AssignNext(ctx, codeInfo.CodeID)
+	// set query specific ctxs
+	ctx = setExecutionType(ctx, ExecutionTypeQuery)
+	ctx = k.concurrentWasmVMContext.AssignNext(ctx, codeInfo.CodeHash)
 
 	env := types.NewEnv(ctx, contractAddress)
 
