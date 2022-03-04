@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 	wasmvm "github.com/CosmWasm/wasmvm"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/terra-money/core/x/wasm/config"
@@ -94,7 +93,6 @@ func (c *ConcurrentWasmVMContext) AssignNext(ctx sdk.Context, codeHash []byte) s
 	i := new(big.Int).SetBytes(codeHash)
 	i2 := new(big.Int).Quo(i, c.p)
 	z := big.NewInt(0).Mod(i2, c.y)
-	fmt.Println("assigned", z.Uint64())
 
 	return ctx.WithContext(context.WithValue(ctx.Context(), contextKeyAllocatedVMIndex, z.Uint64()))
 }
