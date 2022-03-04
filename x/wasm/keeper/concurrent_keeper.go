@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 	wasmvm "github.com/CosmWasm/wasmvm"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/terra-money/core/x/wasm/config"
@@ -88,7 +87,6 @@ func (c *ConcurrentWasmVMContext) AssignNext(ctx sdk.Context, codeID uint64) sdk
 
 	assigned := codeID % uint64(c.config.NumParallelism)
 
-	fmt.Println("----- assigned wasmvm index for query", assigned)
 	return ctx.WithContext(context.WithValue(ctx.Context(), contextKeyAllocatedVMIndex, assigned))
 }
 
@@ -101,7 +99,6 @@ func setExecutionType(ctx sdk.Context, executionType ExecutionType) sdk.Context 
 	if preassigned := ctx.Context().Value(contextKeyExecutionType); preassigned != nil {
 		return ctx
 	}
-	fmt.Println("-----  setting execution type", executionType)
 	return ctx.WithContext(context.WithValue(ctx.Context(), contextKeyExecutionType, executionType))
 }
 
