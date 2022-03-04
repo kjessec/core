@@ -34,6 +34,7 @@ type ConcurrentWasmVMConfig struct {
 type ConcurrentWasmVMContext struct {
 	i                 uint64
 	y                 *big.Int
+	p                 *big.Int
 	config            ConcurrentWasmVMConfig
 	concurrentWasmVMs []types.WasmerEngine
 }
@@ -69,6 +70,7 @@ func NewConcurrentWasmVMContext(
 
 	return &ConcurrentWasmVMContext{
 		i: 0,
+		p: big.NewInt(int64(17)),
 		y: big.NewInt(int64(concurrencyFactor)),
 		config: ConcurrentWasmVMConfig{
 			NumParallelism:  uint(concurrencyFactor),
@@ -90,7 +92,8 @@ func (c *ConcurrentWasmVMContext) AssignNext(ctx sdk.Context, codeHash []byte) s
 	}
 
 	i := new(big.Int).SetBytes(codeHash)
-	z := big.NewInt(0).Mod(i, c.y)
+	i2 := new(big.Int).Quo(i, c.p)
+	z := big.NewInt(0).Mod(i2, c.y)
 	fmt.Println("assigned", z.Uint64())
 
 	return ctx.WithContext(context.WithValue(ctx.Context(), contextKeyAllocatedVMIndex, z.Uint64()))
