@@ -16,6 +16,7 @@ import (
 
 // CompileCode uncompress the wasm code bytes and store the code to local file system
 func (k Keeper) CompileCode(ctx sdk.Context, wasmCode []byte) (codeHash []byte, err error) {
+	ctx = setExecutionType(ctx, ExecutionTypeExecution)
 	maxContractSize := k.MaxContractSize(ctx)
 	if uint64(len(wasmCode)) > maxContractSize {
 		return nil, sdkerrors.Wrap(types.ErrStoreCodeFailed, "contract size is too huge")
@@ -40,6 +41,7 @@ func (k Keeper) CompileCode(ctx sdk.Context, wasmCode []byte) (codeHash []byte, 
 
 // StoreCode uploads and compiles a WASM contract bytecode, returning a short identifier for the stored code
 func (k Keeper) StoreCode(ctx sdk.Context, creator sdk.AccAddress, wasmCode []byte) (codeID uint64, err error) {
+	ctx = setExecutionType(ctx, ExecutionTypeExecution)
 	codeHash, err := k.CompileCode(ctx, wasmCode)
 	if err != nil {
 		return 0, err
@@ -66,6 +68,7 @@ func (k Keeper) StoreCode(ctx sdk.Context, creator sdk.AccAddress, wasmCode []by
 // The migration can be executed by once after columbus-5 update.
 // TODO - remove after columbus-5 update
 func (k Keeper) MigrateCode(ctx sdk.Context, codeID uint64, creator sdk.AccAddress, wasmCode []byte) error {
+	ctx = setExecutionType(ctx, ExecutionTypeExecution)
 	codeInfo, err := k.GetCodeInfo(ctx, codeID)
 	if err != nil {
 		return err
@@ -98,6 +101,7 @@ func (k Keeper) InstantiateContract(
 	defer telemetry.MeasureSince(time.Now(), "wasm", "contract", "instantiate")
 	ctx.GasMeter().ConsumeGas(types.RegisterContractCosts(), "Registering contract to the store")
 	ctx.GasMeter().ConsumeGas(types.InstantiateContractCosts(len(initMsg)), "Loading CosmWasm module: init")
+	ctx = setExecutionType(ctx, ExecutionTypeExecution)
 
 	if uint64(len(initMsg)) > k.MaxContractMsgSize(ctx) {
 		return nil, nil, sdkerrors.Wrap(types.ErrExceedMaxContractMsgSize, "init msg size is too huge")
