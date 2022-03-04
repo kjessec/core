@@ -8,7 +8,6 @@ import (
 	"github.com/terra-money/core/x/wasm/config"
 	"github.com/terra-money/core/x/wasm/types"
 	"path/filepath"
-	"sync/atomic"
 )
 
 const (
@@ -77,7 +76,7 @@ func NewConcurrentWasmVMContext(
 }
 
 // Next
-func (c *ConcurrentWasmVMContext) AssignNext(ctx sdk.Context) sdk.Context {
+func (c *ConcurrentWasmVMContext) AssignNext(ctx sdk.Context, codeID uint64) sdk.Context {
 	// do NOT assign query vm in case of execution
 	if ctx.Value(contextKeyExecutionType).(ExecutionType) == ExecutionTypeExecution {
 		return ctx
@@ -87,9 +86,10 @@ func (c *ConcurrentWasmVMContext) AssignNext(ctx sdk.Context) sdk.Context {
 		return ctx
 	}
 
-	ci := atomic.AddUint64(&c.i, 1)
-	fmt.Println("----- assigned wasmvm index for query", ci)
-	return ctx.WithContext(context.WithValue(ctx.Context(), contextKeyAllocatedVMIndex, ci%uint64(c.config.NumParallelism)))
+	assigned := codeID % uint64(c.config.NumParallelism)
+
+	fmt.Println("----- assigned wasmvm index for query", assigned)
+	return ctx.WithContext(context.WithValue(ctx.Context(), contextKeyAllocatedVMIndex, assigned))
 }
 
 func (c *ConcurrentWasmVMContext) Get(idx uint64) types.WasmerEngine {

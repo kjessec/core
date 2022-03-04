@@ -429,12 +429,13 @@ func (k Keeper) queryToContract(ctx sdk.Context, contractAddress sdk.AccAddress,
 
 	// set query specific ctxs
 	ctx = setExecutionType(ctx, ExecutionTypeQuery)
-	ctx = k.concurrentWasmVMContext.AssignNext(ctx)
 
 	codeInfo, contractStorePrefix, err := k.getContractDetails(ctx, contractAddress)
 	if err != nil {
 		return nil, err
 	}
+
+	ctx = k.concurrentWasmVMContext.AssignNext(ctx, codeInfo.CodeID)
 
 	env := types.NewEnv(ctx, contractAddress)
 
